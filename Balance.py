@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 import requests
 import hashlib
 import hmac
@@ -8,17 +10,17 @@ from telegram.helpers import escape_markdown
 from bs4 import BeautifulSoup
 from pprint import pprint
 import sys
-
+load_dotenv()
 base_url = "http://10.0.0.254/radiusmanager"
 login_url = f"{base_url}/user.php?cont=login"
 lang_url = f"{base_url}/user.php?cont=change_lang&lang=English"
 
-TOKEN = "8487463907:AAE1NzoJy_-JtfEB435AYQZoy062_4tMvOc"
-CHAT_ID = "970042930"
+TOKEN = os.getenv("TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
 bot = Bot(token=TOKEN)
 
-username = '01552802883'
-password = '123'
+username = os.getenv("username")
+password = os.getenv("password")
 
 md5_pass = hashlib.md5(password.encode()).hexdigest()
 md5_hmac = hmac.new(username.encode(), md5_pass.encode(), hashlib.md5).hexdigest()
