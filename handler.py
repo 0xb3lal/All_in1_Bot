@@ -2,7 +2,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from telegram.helpers import escape_markdown
 from config import CHAT_ID
-from botcore import bot, info, date_only
+from core import bot, info, date_only
+
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -13,6 +14,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(f"💰 Balance: {info.get('Available total traffic', 'N/A')}")
     elif data == "deadline":
         await query.edit_message_text(f"⏰ Deadline: {date_only}")
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = await bot.get_chat(CHAT_ID)
