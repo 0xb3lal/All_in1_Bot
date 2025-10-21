@@ -5,6 +5,7 @@ from config import CHAT_ID
 from core import bot, info, date_only
 
 
+# Buttons Handler Function
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -15,7 +16,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "deadline":
         await query.edit_message_text(f"⏰ Deadline: {date_only}")
 
-
+# Start Bot Function
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = await bot.get_chat(CHAT_ID)
     first_name = chat.first_name
@@ -23,8 +24,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = f"*Hello {escaped_name} 👋*"
 
     buttons = [
-        [InlineKeyboardButton("💰 Your Balance", callback_data="balance"),
-         InlineKeyboardButton("📅 Deadline", callback_data="deadline")]
+        [InlineKeyboardButton("💰 Your Balance", callback_data="balance")],
+         [InlineKeyboardButton("📅 Deadline", callback_data="deadline")]
     ]
     keyboard = InlineKeyboardMarkup(buttons)
 
