@@ -1,5 +1,4 @@
 
-- `.env` (environment variables file)
-- `.vscode/` (VS Code settings directory)
-- `config.py` (configuration file)
-
+.env 
+.vscode 
+config.py
