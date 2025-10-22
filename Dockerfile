@@ -1,11 +1,36 @@
+# Use official Python runtime as a parent image
 FROM python:3.11-slim
 
+# Set working directory
 WORKDIR /app
 
-COPY main.py /app/
-COPY requirements.txt /app/
-COPY config.py /app/
+# Install system deps for building some Python packages (if needed)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+	build-essential \
+	curl \
+	ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt /app/
+
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy entire project
+COPY . /app/
+
+# Make entrypoint executable
+RUN chmod +x /app/docker-entrypoint.sh
+
+# Create a non-root user
+RUN useradd --create-home --shell /bin/bash botuser && chown -R botuser:botuser /app
+USER botuser
+
+# Expose nothing by default (Telegram bot uses outbound connections)
+
+# Healthcheck: ensure the process is running (simple check)
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD pgrep -f main.py || exit 1
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["python", "main.py"]

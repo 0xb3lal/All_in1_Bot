@@ -41,8 +41,3 @@ for row in soup.find_all("tr"):
         value = value_cell.text.strip()
         info[key] = value
 
-deadline = info.get("Account expiry")
-if deadline:
-    date_only = deadline.split(" ")[0]
-else:
-    date_only = "N/A"

@@ -1,37 +1,201 @@
+import asyncio
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import ContextTypes
+from telegram.ext import (
+    ContextTypes,
+    MessageHandler,
+    ConversationHandler,
+    CallbackQueryHandler,
+    filters,
+)
+
+from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
-from config import CHAT_ID
-from core import bot, info, date_only
+from core import bot, info
+from genquery import generate_random_distribution, parse_size_to_bytes
+SESSIONS, SIZE = range(2)
 
+# ------------------ Chat Action ------------------ #
 
-# Buttons Handler Function
+async def send_chat_action(bot, chat_id, action=ChatAction.TYPING, delay=1):
+    await bot.send_chat_action(chat_id=chat_id, action=action)
+    await asyncio.sleep(delay)
+
+# How can i git it ?
+
+# await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5) # caht action
+# ------------------ Query Generation Start ------------------ #
+async def start_query_conversation(chat_id: int, context: ContextTypes.DEFAULT_TYPE):
+    """Start the query conversation regardless of source"""
+    context.user_data.clear()  # Clear any previous conversation data
+    context.user_data['in_conversation'] = True
+    
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
+    await bot.send_message(
+        chat_id=chat_id,
+        text="Enter all session IDs separated by commas or spaces.\nSend /cancel to stop."
+    )
+    return SESSIONS
+
+async def gen_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /genquery command"""
+    await send_chat_action(bot, update.effective_chat.id, ChatAction.TYPING, delay=0.5)
+    return await start_query_conversation(update.effective_chat.id, context)
+
+# ------------------ Buttons Handler ------------------ #
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    data = query.data
+    callback = update.callback_query
+    await callback.answer()
+    data = callback.data
+    chat_id = update.effective_chat.id # for chat action
+    chat_id = callback.message.chat.id
+    reply_to = callback.message.message_id
 
     if data == "balance":
-        await query.edit_message_text(f"💰 Balance: {info.get('Available total traffic', 'N/A')}")
-    elif data == "deadline":
-        await query.edit_message_text(f"⏰ Deadline: {date_only}")
+        await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5) #chat action
+        await bot.send_message(
+            chat_id=chat_id,
+            text=f"Balance: {info.get('Available total traffic', 'N/A')}",
+            reply_to_message_id=reply_to
+        )
 
-# Start Bot Function
+    elif data == "query":
+        # Mark that we're starting a conversation
+        context.user_data['in_query_conversation'] = True
+        # Start the conversation and store the state
+        state = await start_query_conversation(chat_id, context)
+        context.user_data['conversation_state'] = state
+        return state
+
+
+# ------------------ Conversation ------------------ #
+async def gen_receive_sessions(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text or ""
+    chat_id = update.effective_chat.id # for chat action
+    sessions = [s.strip() for s in text.replace(" ", ",").split(",") if s.strip()]
+
+    if not sessions:
+        await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
+        await update.message.reply_text("No session IDs detected. Send them again or /cancel.")
+        return SESSIONS
+
+    # Set sessions in context
+    context.user_data['gen_sessions'] = sessions
+    
+    # Send typing action before response
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
+    await update.message.reply_text("Got sessions. Now enter desired total size (e.g., 2.1GB or 500MB):")
+    return SIZE
+
+
+async def gen_receive_size(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text or ""
+    chat_id = update.effective_chat.id # for chat action
+    try:
+        total_bytes = parse_size_to_bytes(text)
+    except ValueError:
+        await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
+        await update.message.reply_text("Invalid size input. Try again or /cancel.")
+        return SIZE
+
+    context.user_data['gen_total_bytes'] = total_bytes
+    sessions = context.user_data.get('gen_sessions', [])
+    total_gb = total_bytes / (1024 ** 3)
+
+    # Show typing for session info
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
+    await update.message.reply_text(
+        f"*Sessions:* {len(sessions)}\n*Total size:* {total_gb:.2f} GB\n\n",
+        parse_mode='Markdown'
+    )
+
+    # Generate queries
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=1.0)  # Longer delay for query generation
+    queries = generate_random_distribution(sessions, total_bytes)
+    full_text = "\n".join(queries)
+    
+    # Show typing before sending the result
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
+    await update.message.reply_text(f"```sql\n\n{full_text}\n\n```", parse_mode='Markdown')
+
+    return ConversationHandler.END
+
+
+async def gen_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    chat_id = update.effective_chat.id # for caht action
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5) #chat action
+
+    await update.message.reply_text("Generation cancelled.")
+    return ConversationHandler.END
+
+
+# ------------------ Conversation Handler ------------------ #
+def get_generate_conv_handler():
+    return ConversationHandler(
+        entry_points=[
+            MessageHandler(filters.Regex('^/genquery$'), gen_start),  # Command entry point
+            CallbackQueryHandler(button_handler, pattern='^query$'),  # Button entry point
+        ],
+        states={
+            SESSIONS: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND, 
+                    gen_receive_sessions
+                )
+            ],
+            SIZE: [
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND, 
+                    gen_receive_size
+                )
+            ],
+        },
+        fallbacks=[
+            MessageHandler(filters.Regex('^/cancel$'), gen_cancel),
+            MessageHandler(filters.COMMAND, gen_cancel),  # Handle any command as cancel
+        ],
+        allow_reentry=True,
+        name="query_conversation",
+        map_to_parent=False
+    )
+
+
+# ------------------ Start ------------------ #
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = await bot.get_chat(CHAT_ID)
-    first_name = chat.first_name
-    escaped_name = escape_markdown(first_name, version=2)
-    message = f"*Hello {escaped_name} 👋*"
+    chat = await bot.get_chat(update.effective_chat.id)
+    chat_id = update.effective_chat.id # for chat action
+    fname = chat.first_name
+    admin = "Admin"
+    username = chat.username  
 
+    escaped_fname = escape_markdown(fname, version=2)
+    escaped_admin = escape_markdown(admin, version=2)
+
+    if username == "belalammar":
+        welcome_msg = f""" *Hello {escaped_admin} 👋🏼*\n*About:* /about """
+    else:
+        welcome_msg = f"""*Hello {escaped_fname} 👋🏼*\n*About:* /about """
+
+    emoji = chr(128732)   
     buttons = [
-        [InlineKeyboardButton("💰 Your Balance", callback_data="balance")],
-         [InlineKeyboardButton("📅 Deadline", callback_data="deadline")]
+        [InlineKeyboardButton(f" {emoji} Balance", callback_data="balance")],
+        [InlineKeyboardButton(" 🔁 Gen Query", callback_data="query")]
     ]
     keyboard = InlineKeyboardMarkup(buttons)
 
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5) #caht action
     await bot.send_message(
-        chat_id=CHAT_ID,
-        text=message,
+        chat_id=update.effective_chat.id,
+        text=welcome_msg,
         parse_mode='MarkdownV2',
         reply_markup=keyboard
     )
+# ------------------ About ------------------ #
+async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    auther = "belalammar"
+    about_text = f"""*Private Bot*\n\n*_Auther:_* *_[Textme](https://t.me/{auther})_*"""
+
+    chat_id = update.effective_chat.id  # Fix chat_id
+    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
+    await update.message.reply_text(about_text, parse_mode="MarkdownV2")
+    
