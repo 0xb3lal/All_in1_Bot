@@ -28,11 +28,12 @@ async def start_query_conversation(chat_id: int, context: ContextTypes.DEFAULT_T
     """Start the query conversation regardless of source"""
     context.user_data.clear()  # Clear any previous conversation data
     context.user_data['in_conversation'] = True
-    
+    text = "<b>No valid session IDs detected.\n/cancel to stop.</b>"
     await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
     await bot.send_message(
         chat_id=chat_id,
-        text="Enter all session IDs separated by commas or spaces.\nSend /cancel to stop."
+        text=text,
+        parse_mode="HTML"
     )
     return SESSIONS
 
@@ -62,7 +63,7 @@ async def gen_receive_sessions(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if not sessions:
         await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
-        await update.message.reply_text("No valid session IDs detected. Please send numeric session IDs separated by spaces or commas.\nSend /cancel to stop.")
+        await update.message.reply_text("No valid session IDs detected.\n/cancel to stop.")
         return SESSIONS
 
     # Set sessions in context
