@@ -11,15 +11,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt /app/
+# Copy entrypoint and requirements first
+COPY docker-entrypoint.sh requirements.txt /app/
+
+# Set executable permissions for entrypoint
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy entrypoint first (avoid .dockerignore excluding it) and make it executable
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
 
 # Copy entire project
 COPY . /app/
