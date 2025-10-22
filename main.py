@@ -35,8 +35,7 @@ if __name__ == "__main__":
 
     
     # Add conversation handler first (to handle query button and conversation)
-    app.add_handler(get_generate_onv_handler())
-    
+    app.add_handler(get_generate_conv_handler())
     # Add other command handlers
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("about", about))
