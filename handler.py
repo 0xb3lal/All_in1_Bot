@@ -10,7 +10,7 @@ from telegram.ext import (
 
 from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
-from core import bot, info
+from core import bot
 from genquery import generate_random_distribution, parse_size_to_bytes
 SESSIONS, SIZE = range(2)
 
@@ -48,17 +48,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = callback.data
     chat_id = update.effective_chat.id # for chat action
     chat_id = callback.message.chat.id
-    reply_to = callback.message.message_id
 
-    if data == "balance":
-        await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5) #chat action
-        await bot.send_message(
-            chat_id=chat_id,
-            text=f"Balance: {info.get('Available total traffic', 'N/A')}",
-            reply_to_message_id=reply_to
-        )
-
-    elif data == "query":
+    if data == "query":
         # Mark that we're starting a conversation
         context.user_data['in_query_conversation'] = True
         # Start the conversation and store the state
@@ -156,7 +147,8 @@ def get_generate_conv_handler():
         ],
         allow_reentry=True,
         name="query_conversation",
-        map_to_parent=False
+        map_to_parent=False,
+        per_message=True
     )
 
 
@@ -175,10 +167,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_msg = f""" *Hello {escaped_admin} 👋🏼*\n*About:* /about """
     else:
         welcome_msg = f"""*Hello {escaped_fname} 👋🏼*\n*About:* /about """
-
-    emoji = chr(128732)   
+   
     buttons = [
-        [InlineKeyboardButton(f" {emoji} Balance", callback_data="balance")],
+    
         [InlineKeyboardButton(" 🔁 Gen Query", callback_data="query")]
     ]
     keyboard = InlineKeyboardMarkup(buttons)
