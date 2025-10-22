@@ -32,5 +32,5 @@ USER botuser
 # Healthcheck: ensure the process is running (simple check)
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD pgrep -f main.py || exit 1
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+ENTRYPOINT ["bash", "/app/docker-entrypoint.sh"]
 CMD ["python", "main.py"]
