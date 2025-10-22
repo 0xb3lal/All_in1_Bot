@@ -37,7 +37,6 @@ async def start_query_conversation(chat_id: int, context: ContextTypes.DEFAULT_T
     return SESSIONS
 
 async def gen_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle /genquery command"""
     await send_chat_action(bot, update.effective_chat.id, ChatAction.TYPING, delay=0.5)
     return await start_query_conversation(update.effective_chat.id, context)
 
