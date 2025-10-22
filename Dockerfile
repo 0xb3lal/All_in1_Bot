@@ -17,11 +17,12 @@ COPY requirements.txt /app/
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy entrypoint first (avoid .dockerignore excluding it) and make it executable
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
 # Copy entire project
 COPY . /app/
-
-# Make entrypoint executable
-RUN chmod +x /app/docker-entrypoint.sh
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash botuser && chown -R botuser:botuser /app
