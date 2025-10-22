@@ -46,27 +46,24 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     callback = update.callback_query
     await callback.answer()
     data = callback.data
-    chat_id = update.effective_chat.id # for chat action
     chat_id = callback.message.chat.id
 
     if data == "query":
-        # Mark that we're starting a conversation
-        context.user_data['in_query_conversation'] = True
-        # Start the conversation and store the state
-        state = await start_query_conversation(chat_id, context)
-        context.user_data['conversation_state'] = state
-        return state
+        # Start the conversation
+        await callback.message.delete()  # Remove the inline keyboard
+        return await start_query_conversation(chat_id, context)
 
 
 # ------------------ Conversation ------------------ #
 async def gen_receive_sessions(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text or ""
-    chat_id = update.effective_chat.id # for chat action
-    sessions = [s.strip() for s in text.replace(" ", ",").split(",") if s.strip()]
+    chat_id = update.effective_chat.id
+    # Handle both space and comma separators, and clean up input
+    sessions = [s.strip() for s in text.replace(",", " ").split() if s.strip() and s.strip().isalnum()]
 
     if not sessions:
         await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
-        await update.message.reply_text("No session IDs detected. Send them again or /cancel.")
+        await update.message.reply_text("No valid session IDs detected. Please send numeric session IDs separated by spaces or commas.\nSend /cancel to stop.")
         return SESSIONS
 
     # Set sessions in context
@@ -147,8 +144,8 @@ def get_generate_conv_handler():
         ],
         allow_reentry=True,
         name="query_conversation",
-        map_to_parent=False,
-        per_message=True
+        persistent=False,
+        per_chat=True
     )
 
 
