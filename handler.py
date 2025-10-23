@@ -10,6 +10,7 @@ from telegram.ext import (
 from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
 from core import bot
+from config import ADMIN
 from genquery import generate_random_distribution, parse_size_to_bytes
 SESSIONS, SIZE = range(2)
 
@@ -158,15 +159,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     escaped_fname = escape_markdown(fname, version=2)
 
-    if username == "belalammar":
+    if username == ADMIN:
         escaped_admin = escape_markdown("Admin", version=2)
-        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n\n```\nSend The Video Link``` "
+        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n\nSend The Video Link* "
 
         buttons = [[InlineKeyboardButton("🔁 Gen Query", callback_data="query")]]
         keyboard = InlineKeyboardMarkup(buttons)
 
     else:
-        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n\n```\nSend The Video Link```"
+        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n\n*Send The Video Link*"
         keyboard = None
 
 
