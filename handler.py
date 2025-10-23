@@ -156,10 +156,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     fname = chat.first_name
     username = chat.username
-
     escaped_fname = escape_markdown(fname, version=2)
 
-    if username == ADMIN:
+    if username and username.lower() == ADMIN.lower():
         escaped_admin = escape_markdown("Admin", version=2)
         welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n\nSend The Video Link* "
 
