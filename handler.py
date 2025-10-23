@@ -189,8 +189,3 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
     await update.message.reply_text(about_text, parse_mode="MarkdownV2")
     
-
-def register_tiktok_handlers(app):
-    
-    app.add_handler(CommandHandler("tiktok", start_tiktok))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tiktok))
