@@ -10,7 +10,6 @@ from telegram.ext import (
 from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
 from core import bot
-from config import ADMIN
 from genquery import generate_random_distribution, parse_size_to_bytes
 SESSIONS, SIZE = range(2)
 
