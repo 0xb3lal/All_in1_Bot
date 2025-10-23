@@ -84,5 +84,5 @@ async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await progress_msg.delete()
 
 def tiktok_handler(app):
-    app.add_handler(CommandHandler("dl", start_dl))
+
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tiktok))

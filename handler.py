@@ -160,12 +160,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if username == "belalammar":
         escaped_admin = escape_markdown("Admin", version=2)
-        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n*Download:* /dl"
+        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n*Download Viedos:\nSend The Video Link ↘* "
+
         buttons = [[InlineKeyboardButton("🔁 Gen Query", callback_data="query")]]
         keyboard = InlineKeyboardMarkup(buttons)
+
     else:
-        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n*Download:* /dl"
-        keyboard = None  # لو مش admin مفيش keyboard
+        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n*Download Viedos:\nSend The Video Link ↘*"
+        keyboard = None
 
     await context.bot.send_chat_action(chat_id=chat_id, action=ChatAction.TYPING)
     await context.bot.send_message(
