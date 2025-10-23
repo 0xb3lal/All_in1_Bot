@@ -166,7 +166,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = InlineKeyboardMarkup(buttons)
 
     else:
-        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n```\nSend The Video Link ↘```"
+        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n\n```\nSend The Video Link ↘```"
         keyboard = None
 
 
