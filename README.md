@@ -1,6 +1,6 @@
 # Balance Bot
 
-[![Telegram](https://img.shields.io/badge/Telegram-Bot-26A5E4?logo=telegram&logoColor=white)](https://t.me/<BOT_USERNAME>) [![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Telegram](https://img.shields.io/badge/Telegram-Bot-26A5E4?logo=telegram&logoColor=white)](https://t.me/MyBot) [![Python](https://img.shields.io/badge/Python-3.14-blue?logo=python&logoColor=white)](https://www.python.org/)
 
 Balance is a compact Telegram bot that transforms a list of session identifiers and a requested total data size into SQL UPDATE statements. It divides the total bytes across the provided sessions in a randomized but balanced way and returns ready-to-run SQL suitable for updating per-session accounting records.
 
