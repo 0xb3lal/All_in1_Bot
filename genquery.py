@@ -21,6 +21,8 @@ def generate_random_distribution(sessions, total_bytes):
             f"UPDATE radacct\n"
             f"SET acctinputoctets = {acct_input}, acctoutputoctets = {acct_output}\n"
             f"WHERE acctsessionid = '{session}';\n"
+            f"----------------------------------------------------------------------\n"
+
         )
         queries.append(q)
     return queries
