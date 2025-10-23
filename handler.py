@@ -151,29 +151,25 @@ def get_generate_conv_handler():
 
 # ------------------ Start ------------------ #
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = await bot.get_chat(update.effective_chat.id)
-    chat_id = update.effective_chat.id # for chat action
+    chat = await context.bot.get_chat(update.effective_chat.id)
+    chat_id = update.effective_chat.id
     fname = chat.first_name
-    admin = "Admin"
-    username = chat.username  
+    username = chat.username
 
     escaped_fname = escape_markdown(fname, version=2)
-    escaped_admin = escape_markdown(admin, version=2)
 
     if username == "belalammar":
-        welcome_msg = f""" *Hello {escaped_admin} 👋🏼*\n*Downlod:* /dl """
+        escaped_admin = escape_markdown("Admin", version=2)
+        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n*Download:* /dl"
+        buttons = [[InlineKeyboardButton("🔁 Gen Query", callback_data="query")]]
+        keyboard = InlineKeyboardMarkup(buttons)
     else:
-        welcome_msg = f"""*Hello {escaped_fname} 👋🏼*\n*Downlod:* /dl """
-   
-    buttons = [
-    
-        [InlineKeyboardButton(" 🔁 Gen Query", callback_data="query")]
-    ]
-    keyboard = InlineKeyboardMarkup(buttons)
+        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n*Download:* /dl"
+        keyboard = None  # لو مش admin مفيش keyboard
 
-    await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5) #caht action
-    await bot.send_message(
-        chat_id=update.effective_chat.id,
+    await context.bot.send_chat_action(chat_id=chat_id, action=ChatAction.TYPING)
+    await context.bot.send_message(
+        chat_id=chat_id,
         text=welcome_msg,
         parse_mode='MarkdownV2',
         reply_markup=keyboard
