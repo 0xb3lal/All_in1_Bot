@@ -35,12 +35,14 @@ async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_TYPE):
     ydl_opts = {
-        'format': 'mp4',
-        'outtmpl': 'downloads/%(id)s.%(ext)s',
-        'merge_output_format': 'mp4',
-        'concurrent_fragment_downloads': 3,
-        'quiet': True,
-    }
+    'format': 'bestvideo+bestaudio/best',
+    'outtmpl': 'downloads/%(id)s.%(ext)s',
+    'merge_output_format': 'mp4',
+    'concurrent_fragment_downloads': 1,
+    'quiet': True,
+    'noplaylist': True,
+    'no_warnings': True,
+}
     os.makedirs('downloads', exist_ok=True)
 
     try:
@@ -78,6 +80,7 @@ async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_video(video, caption="<b>Done ✔️</b>", parse_mode="HTML")
     os.remove(file_name)
     if progress_msg:
+        await asyncio.sleep(0.5)
         await progress_msg.delete()
 
 def tiktok_handler(app):
