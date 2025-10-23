@@ -7,7 +7,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     filters,
 )
-from tiktokdl import register_tiktok_handlers
+from tiktokdl import tiktok_downloader, tiktok_url,show_fake_progress
 from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
 from core import bot
@@ -179,7 +179,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='MarkdownV2',
         reply_markup=keyboard
     )
-
 # ------------------ About ------------------ #
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     auther = "belalammar"
