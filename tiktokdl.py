@@ -5,8 +5,6 @@ from telegram import Update
 from telegram.constants import ChatAction
 from telegram.ext import CommandHandler, MessageHandler, ContextTypes, filters
 
-
-
 async def send_chat_action(update: Update, context: ContextTypes.DEFAULT_TYPE, action=ChatAction.TYPING, delay=1.5):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=action)
     await asyncio.sleep(delay)
@@ -41,10 +39,14 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
         'quiet': True,
     }
     os.makedirs('downloads', exist_ok=True)
+
     try:
+
         await send_chat_action(update, context, ChatAction.UPLOAD_VIDEO, delay=1)
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(link, download=True)
+            # Fake progress
             await show_fake_progress(update, context, delay=1.5, start_msg="Downloading...")
             filename = ydl.prepare_filename(info)
         file_size = os.path.getsize(filename)
@@ -58,15 +60,10 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
         return None
 
 
-async def start_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    uname = update.effective_user.first_name
-    username = update.effective_user.username
-    if username == "belalammar":
-        msg = f"Welcome Back <b>Admin 👋</b>\n\nSend The Video <b>Link ↘</b>"
-    else:
-        msg = f"Hello <b>{uname}</b>, Welcome To Bot 👋\n\nSend The Video <b>Link ↘</b>"
-    await send_chat_action(update, context, ChatAction.TYPING, delay=1)
-    await update.message.reply_text(msg, parse_mode="HTML")
+
+async def start_dl(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Send the video link")
+
 
 
 async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -82,7 +79,6 @@ async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
     os.remove(file_name)
 
 
-def register_tiktok_handlers(app):
-
-    app.add_handler(CommandHandler("tiktok", start_tiktok))
+def tiktok_handler(app):
+    app.add_handler(CommandHandler("dl", start_dl))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tiktok))

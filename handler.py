@@ -28,7 +28,7 @@ async def start_query_conversation(chat_id: int, context: ContextTypes.DEFAULT_T
     """Start the query conversation regardless of source"""
     context.user_data.clear()  # Clear any previous conversation data
     context.user_data['in_conversation'] = True
-    text = "<b>No valid session IDs detected.\n/cancel to stop.</b>"
+    text = "<b>Enter The sessions IDs\n/cancel to stop.</b>"
     await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
     await bot.send_message(
         chat_id=chat_id,

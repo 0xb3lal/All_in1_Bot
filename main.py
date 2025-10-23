@@ -10,7 +10,7 @@ from handler import (
     start,
     about
 )
-from tiktokdl import register_tiktok_handlers  
+from tiktokdl import tiktok_handler
 
 if __name__ == "__main__":
 
@@ -31,12 +31,10 @@ if __name__ == "__main__":
         except:
             pass
 
-    
     app.add_handler(get_generate_conv_handler())
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("about", about))
-
-    register_tiktok_handlers(app)
+    tiktok_handler(app)
 
     app.add_error_handler(on_error)
 
