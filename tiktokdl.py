@@ -1,8 +1,10 @@
 import os
 import yt_dlp
 import asyncio
-from telegram import Update, ChatAction
+from telegram import Update
+from telegram.constants import ChatAction
 from telegram.ext import CommandHandler, MessageHandler, ContextTypes, filters
+
 
 
 async def send_chat_action(update: Update, context: ContextTypes.DEFAULT_TYPE, action=ChatAction.TYPING, delay=1.5):
