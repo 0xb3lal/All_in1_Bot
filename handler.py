@@ -161,9 +161,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     escaped_admin = escape_markdown(admin, version=2)
 
     if username == "belalammar":
-        welcome_msg = f""" *Hello {escaped_admin} 👋🏼*\n*dl:* /dl """
+        welcome_msg = f""" *Hello {escaped_admin} 👋🏼*\n*Downlod:* /dl """
     else:
-        welcome_msg = f"""*Hello {escaped_fname} 👋🏼*\n*dl:* /dl """
+        welcome_msg = f"""*Hello {escaped_fname} 👋🏼*\n*Downlod:* /dl """
    
     buttons = [
     
