@@ -166,8 +166,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = InlineKeyboardMarkup(buttons)
 
     else:
-        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n```sql\nSend The Video Link ↘\n```*"
+        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n```Send The Video Link ↘```"
         keyboard = None
+
 
     await context.bot.send_chat_action(chat_id=chat_id, action=ChatAction.TYPING)
     await context.bot.send_message(
