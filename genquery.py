@@ -18,7 +18,7 @@ def generate_random_distribution(sessions, total_bytes):
         acct_input = random.randint(lower, upper)
         acct_output = allocated[i-1] - acct_input
         q = (
-            f"-----------------------------------Query {i}-----------------------------------\n"
+            f"-----------------------------------Query {i}-----------------------------------\n\n"
             f"UPDATE radacct\n"
             f"SET acctinputoctets = {acct_input}, acctoutputoctets = {acct_output}\n"
             f"WHERE acctsessionid = '{session}';\n"
