@@ -80,7 +80,7 @@ async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_video(video, caption="<b>Done ✔️</b>", parse_mode="HTML")
     os.remove(file_name)
     if progress_msg:
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
         await progress_msg.delete()
 
 def tiktok_handler(app):
