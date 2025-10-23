@@ -10,7 +10,7 @@ async def send_chat_action(update: Update, context: ContextTypes.DEFAULT_TYPE, a
     await asyncio.sleep(delay)
 
 
-async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE, delay=0.8, start_msg="Downloading...\n"):
+async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE, delay=0.8, start_msg="Downloading..."):
     progress_states = [
         "█▒▒▒▒▒▒▒▒▒ 10%",
         "██▒▒▒▒▒▒▒▒ 20%",
@@ -27,7 +27,7 @@ async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE,
     for state in progress_states[1:]:
         await asyncio.sleep(delay)
         await msg.edit_text(f"{start_msg}\n{state}")
-    await msg.edit_text(f"<b>Done ✔️</b>\n\n{progress_states[-1]}", parse_mode="HTML")
+    await msg.edit_text(f"<b>Sending a video\n </b>\n\n{progress_states[-1]}", parse_mode="HTML")
 
 
 async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -46,8 +46,12 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(link, download=True)
-            # Fake progress
-            await show_fake_progress(update, context, delay=1.5, start_msg="Downloading...")
+
+            await asyncio.gather(
+    send_chat_action(update, context, ChatAction.UPLOAD_VIDEO, delay=1),
+    show_fake_progress(update, context, delay=1.5, start_msg="Downloading...")
+)
+            
             filename = ydl.prepare_filename(info)
         file_size = os.path.getsize(filename)
         if file_size > 50 * 1024 * 1024:
@@ -62,7 +66,7 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
 
 
 async def start_dl(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Send the video link")
+    await update.message.reply_text("<b>Send The Video Link ↘</b> ", parse_mode="HTML")
 
 
 
@@ -71,9 +75,11 @@ async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not text.startswith("https"):
         await update.message.reply_text("Invalid link ❗")
         return
+    
     file_name = await tiktok_downloader(text, update, context)
     if not file_name:
         return
+    
     with open(file_name, "rb") as video:
         await update.message.reply_video(video, caption="<b>Done ✔️</b>", parse_mode="HTML")
     os.remove(file_name)
