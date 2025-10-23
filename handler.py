@@ -7,12 +7,13 @@ from telegram.ext import (
     CallbackQueryHandler,
     filters,
 )
-
+from tiktokdl import register_tiktok_handlers
 from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
 from core import bot
 from genquery import generate_random_distribution, parse_size_to_bytes
 SESSIONS, SIZE = range(2)
+
 
 # ------------------ Chat Action ------------------ #
 
@@ -178,12 +179,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='MarkdownV2',
         reply_markup=keyboard
     )
+
 # ------------------ About ------------------ #
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     auther = "belalammar"
     about_text = f"""*Private Bot*\n\n*_Auther:_* *_[Textme](https://t.me/{auther})_*"""
 
-    chat_id = update.effective_chat.id  # Fix chat_id
+    chat_id = update.effective_chat.id 
     await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
     await update.message.reply_text(about_text, parse_mode="MarkdownV2")
     
+
+def register_tiktok_handlers(app):
+    
+    app.add_handler(CommandHandler("tiktok", start_tiktok))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tiktok))

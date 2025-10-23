@@ -1,17 +1,16 @@
 from config import TOKEN
 from telegram.ext import (
     ApplicationBuilder,
-    CallbackQueryHandler,
     CommandHandler,
     ContextTypes
 )
 from telegram import Update
 from handler import (
     get_generate_conv_handler,
-    button_handler,
     start,
     about
 )
+from tiktokdl import register_tiktok_handlers  
 
 if __name__ == "__main__":
 
@@ -24,7 +23,6 @@ if __name__ == "__main__":
         .build()
     )
 
-
     async def on_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Error: {context.error}")
         try:
@@ -34,14 +32,11 @@ if __name__ == "__main__":
             pass
 
     
-    # Add conversation handler first (to handle query button and conversation)
     app.add_handler(get_generate_conv_handler())
-    # Add other command handlers
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("about", about))
-    
-    # Add balance button handler
-    app.add_handler(CallbackQueryHandler(button_handler, pattern="^balance$"))
+
+    register_tiktok_handlers(app)
 
     app.add_error_handler(on_error)
 
