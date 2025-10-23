@@ -103,7 +103,7 @@ async def gen_receive_size(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Show typing before sending the result
     await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
-    await update.message.reply_text(f"```sql\n\n{full_text}\n\n```", parse_mode='Markdown')
+    await update.message.reply_text(f"<pre language='sql'>\n\n{full_text}\n\n</pre>", parse_mode='HTML')
 
     return ConversationHandler.END
 
