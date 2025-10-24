@@ -158,8 +158,10 @@ def get_generate_conv_handler():
 # ------------------ Start ------------------ #
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
+    callback = update.callback_query
 
     if str(chat_id) != str(AUTHORIZED_CHAT_ID):
+        await callback.answer("You are not authorized to use this bot.", show_alert=True)
         return
 
     chat = await context.bot.get_chat(chat_id)
@@ -187,8 +189,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ------------------ About ------------------ #
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
+    callback = update.callback_query
 
     if str(chat_id) != str(AUTHORIZED_CHAT_ID):
+        await callback.answer("You are not authorized to use this bot.", show_alert=True)
         return
 
     auther = "belalammar"

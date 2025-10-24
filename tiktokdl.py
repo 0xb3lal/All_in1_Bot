@@ -65,8 +65,11 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
         return None, None
 
 async def start_dl(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    callback = update.callback_query
 
-    if str(update.effective_chat.id) != AUTHORIZED_CHAT_ID:
+    if str(chat_id) != str(AUTHORIZED_CHAT_ID):
+        await callback.answer("You are not authorized to use this bot.", show_alert=True)
         return
     await update.message.reply_text("<b>Send The Video Link ↘</b>", parse_mode="HTML")
 
