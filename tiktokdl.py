@@ -30,7 +30,7 @@ async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE,
     for state in progress_states[1:]:
         await asyncio.sleep(delay)
         await msg.edit_text(f"{start_msg}\n{state}")
-    await msg.edit_text(f"<b>Sent successfully ✔️ </b>\n{progress_states[-1]}", parse_mode="HTML")
+    await msg.edit_text(f"<b>Sent ✔️ </b>\n{progress_states[-1]}", parse_mode="HTML")
     return msg
 
 async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -49,7 +49,7 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
         chat_task = asyncio.create_task(send_chat_action_loop(update, context, ChatAction.UPLOAD_VIDEO))
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(link, download=True)
-            progress_msg = await show_fake_progress(update, context, delay=1.5, start_msg="Downloading...")
+            progress_msg = await show_fake_progress(update, context, delay=1.5, start_msg="Loading...")
             filename = ydl.prepare_filename(info)
 
         chat_task.cancel()
