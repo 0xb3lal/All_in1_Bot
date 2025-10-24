@@ -4,7 +4,6 @@ import asyncio
 from telegram import Update
 from telegram.constants import ChatAction
 from telegram.ext import CommandHandler, MessageHandler, ContextTypes, filters
-from config import AUTHORIZED_CHAT_ID  
 
 async def send_chat_action_loop(update: Update, context: ContextTypes.DEFAULT_TYPE, action=ChatAction.UPLOAD_VIDEO):
     try:
@@ -36,14 +35,14 @@ async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_TYPE):
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',
-        'outtmpl': 'downloads/%(id)s.%(ext)s',
-        'merge_output_format': 'mp4',
-        'concurrent_fragment_downloads': 1,
-        'quiet': True,
-        'noplaylist': True,
-        'no_warnings': True,
-    }
+    'format': 'bestvideo+bestaudio/best',
+    'outtmpl': 'downloads/%(id)s.%(ext)s',
+    'merge_output_format': 'mp4',
+    'concurrent_fragment_downloads': 1,
+    'quiet': True,
+    'noplaylist': True,
+    'no_warnings': True,
+}
     os.makedirs('downloads', exist_ok=True)
 
     try:
@@ -65,19 +64,9 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
         return None, None
 
 async def start_dl(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
-    callback = update.callback_query
-
-    if str(chat_id) != str(AUTHORIZED_CHAT_ID):
-        await callback.answer("You are not authorized to use this bot.", show_alert=True)
-        return
     await update.message.reply_text("<b>Send The Video Link ↘</b>", parse_mode="HTML")
 
 async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    if str(update.effective_chat.id) != AUTHORIZED_CHAT_ID:
-        return
-
     text = update.message.text
     if not text.startswith("https://vt.tiktok"):
         await update.message.reply_text("Invalid link ❗")
@@ -95,4 +84,5 @@ async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await progress_msg.delete()
 
 def tiktok_handler(app):
+
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tiktok))

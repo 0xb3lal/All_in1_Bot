@@ -20,9 +20,6 @@ async def send_chat_action(bot, chat_id, action=ChatAction.TYPING, delay=1):
     await bot.send_chat_action(chat_id=chat_id, action=action)
     await asyncio.sleep(delay)
 
-# How can i git it ?
-# await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5) # caht action
-
 # ------------------ Query Generation Start ------------------ #
 async def start_query_conversation(chat_id: int, context: ContextTypes.DEFAULT_TYPE):
     """Start the query conversation regardless of source"""
