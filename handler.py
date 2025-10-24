@@ -160,13 +160,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if username == "belalammar":
         escaped_admin = escape_markdown("Admin", version=2)
-        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n\nDrop The Video Link\n*"
+        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\nDrop The Video Link"
+
 
         buttons = [[InlineKeyboardButton("🔁 Gen Query", callback_data="query")]]
         keyboard = InlineKeyboardMarkup(buttons)
 
     else:
-        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n\nDrop The Video Link\n"
+        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\nDrop The Video Link"
         keyboard = None
 
 
