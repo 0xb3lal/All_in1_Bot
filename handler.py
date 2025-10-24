@@ -16,7 +16,7 @@ from genquery import generate_random_distribution, parse_size_to_bytes
 SESSIONS, SIZE = range(2)
 
 
-# ------------------ Chat Action ------------------ #
+# ------------------ Chat Action ------------------- #
 async def send_chat_action(bot, chat_id, action=ChatAction.TYPING, delay=1):
     await bot.send_chat_action(chat_id=chat_id, action=action)
     await asyncio.sleep(delay)
