@@ -3,7 +3,7 @@ import yt_dlp
 import asyncio
 from telegram import Update, InputMediaPhoto
 from telegram.constants import ChatAction
-from telegram.ext import CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import MessageHandler, ContextTypes, filters
 
 async def send_chat_action_loop(update: Update, context: ContextTypes.DEFAULT_TYPE, action=ChatAction.UPLOAD_VIDEO):
     try:
@@ -30,7 +30,7 @@ async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE,
     for state in progress_states[1:]:
         await asyncio.sleep(delay)
         await msg.edit_text(f"{start_msg}\n{state}")
-    await msg.edit_text(f"<b>Sent ✔️</b>\n{progress_states[-1]}", parse_mode="HTML")
+    await msg.edit_text(f"<b>Sent ✔️ </b>\n{progress_states[-1]}", parse_mode="HTML")
     return msg
 
 async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -38,6 +38,7 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
         'format': 'bestvideo+bestaudio/best',
         'outtmpl': 'downloads/%(id)s.%(ext)s',
         'merge_output_format': 'mp4',
+        'concurrent_fragment_downloads': 1,
         'quiet': True,
         'noplaylist': True,
         'no_warnings': True,
@@ -47,52 +48,33 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
     try:
         chat_task = asyncio.create_task(send_chat_action_loop(update, context, ChatAction.UPLOAD_VIDEO))
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(link, download=True)
-            progress_msg = await show_fake_progress(update, context, delay=1.5, start_msg="Loading...")
+            info = ydl.extract_info(link, download=False)
 
-        chat_task.cancel()
+            # التحقق هل المحتوى صور ولا فيديو
+            if "entries" in info:  # يعني فيه صور متعددة (ألبوم)
+                image_urls = [entry["url"] for entry in info["entries"]]
+                chat_task.cancel()
+                await show_fake_progress(update, context, delay=1.2, start_msg="Loading photos...")
 
-        # Detect if it’s a photo post
-        if info.get('ext') == 'jpg' or info.get('ext') == 'png' or 'entries' in info:
-            # Handle images
-            photos = []
-            if 'entries' in info:
-                # Multiple images
-                for entry in info['entries']:
-                    file_path = ydl.prepare_filename(entry)
-                    photos.append(file_path)
-            else:
-                # Single image
-                file_path = ydl.prepare_filename(info)
-                photos.append(file_path)
+                media_group = [InputMediaPhoto(url) for url in image_urls[:10]]  # تليجرام بيسمح بـ 10 صور فقط في الألبوم
+                await update.message.reply_media_group(media_group)
+                return None, None
 
-            # Send all photos
-            media = [InputMediaPhoto(open(p, 'rb')) for p in photos]
-            await update.message.reply_media_group(media)
-            for p in photos:
-                os.remove(p)
-            await progress_msg.delete()
-            return None, progress_msg
-
-        # Otherwise handle video
-        filename = ydl.prepare_filename(info)
-        file_size = os.path.getsize(filename)
-        if file_size > 50 * 1024 * 1024:
-            await update.message.reply_text("⚠️ Video too large for Telegram (over 50MB).")
-            return None, None
-        return filename, progress_msg
+            else:  # فيديو عادي
+                ydl.download([link])
+                progress_msg = await show_fake_progress(update, context, delay=1.5, start_msg="Loading video...")
+                filename = ydl.prepare_filename(info)
+                chat_task.cancel()
+                return filename, progress_msg
 
     except Exception as e:
         print(f"[!] Download error: {e}")
-        await update.message.reply_text("⚠️ Failed to download content. Try again later.")
+        await update.message.reply_text("⚠️ Failed to download media. Try again later.")
         return None, None
-
-async def start_dl(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("<b>Send The Video or Photo Link ↘</b>", parse_mode="HTML")
 
 async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-    if not text.startswith("https://vt.tiktok"):
+    if not text.startswith("https://vt.tiktok") and not text.startswith("https://www.tiktok"):
         await update.message.reply_text("Invalid link ❗")
         return
 
@@ -100,15 +82,21 @@ async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not file_name:
         return
 
-    with open(file_name, "rb") as video:
-        await update.message.reply_video(video, caption="<b>Done ✔️</b>", parse_mode="HTML")
-    os.remove(file_name)
-    if progress_msg:
-        await asyncio.sleep(1.5)
-        await progress_msg.delete()
+    try:
+        with open(file_name, "rb") as video:
+            await update.message.reply_video(video, caption="<b>Done ✔️</b>", parse_mode="HTML")
+    except Exception as e:
+        await update.message.reply_text(f"⚠️ Can't send file: {e}")
+    finally:
+        if os.path.exists(file_name):
+            os.remove(file_name)
+        if progress_msg:
+            await asyncio.sleep(1.5)
+            await progress_msg.delete()
 
 def tiktok_handler(app):
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tiktok))
+
 
 
 
