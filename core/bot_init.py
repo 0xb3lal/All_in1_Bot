@@ -1,6 +1,6 @@
-from telegram import Bot
-from config import TOKEN
+# from telegram import Bot
+# from config import TOKEN
 
-bot = Bot(token=TOKEN)
+# bot = Bot(token=TOKEN)
 
 
