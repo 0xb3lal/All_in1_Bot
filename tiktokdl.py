@@ -13,7 +13,7 @@ async def send_chat_action_loop(update: Update, context: ContextTypes.DEFAULT_TY
     except asyncio.CancelledError:
         pass
 
-async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE, delay=0.8, start_msg="Downloading..."):
+async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE, delay=0.8, start_msg="Loading..."):
     progress_states = [
         "█▒▒▒▒▒▒▒▒▒ 10%",
         "██▒▒▒▒▒▒▒▒ 20%",
@@ -30,7 +30,7 @@ async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE,
     for state in progress_states[1:]:
         await asyncio.sleep(delay)
         await msg.edit_text(f"{start_msg}\n{state}")
-    await msg.edit_text(f"<b>Sending a video </b>\n{progress_states[-1]}", parse_mode="HTML")
+    await msg.edit_text(f"<b>Sent successfully ✔️ </b>\n{progress_states[-1]}", parse_mode="HTML")
     return msg
 
 async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_TYPE):
