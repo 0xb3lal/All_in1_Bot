@@ -68,7 +68,7 @@ async def start_dl(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-    if not text.startswith("https"):
+    if not text.startswith("https://vt.tiktok/"):
         await update.message.reply_text("Invalid link ❗")
         return
 
