@@ -22,7 +22,7 @@ if __name__ == "__main__":
         .pool_timeout(20)
         .build()
     )
-
+    
     async def on_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Error: {context.error}")
         try:
@@ -34,6 +34,7 @@ if __name__ == "__main__":
     app.add_handler(get_generate_conv_handler())
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("about", about))
+
     tiktok_handler(app)
 
     app.add_error_handler(on_error)
