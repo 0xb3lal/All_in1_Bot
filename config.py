@@ -3,4 +3,4 @@ import os
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-AUTHORIZED_CHAT_ID = os.getenv("AUTHORIZED_CHAT_ID")
+
