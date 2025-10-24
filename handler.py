@@ -25,7 +25,7 @@ async def start_query_conversation(chat_id: int, context: ContextTypes.DEFAULT_T
     """Start the query conversation regardless of source"""
     context.user_data.clear()  # Clear any previous conversation data
     context.user_data['in_conversation'] = True
-    text = "<b>Enter The sessions IDs\n/cancel to stop.</b>"
+    text = "<b>Enter The sessions IDs\n\n/cancel to stop.</b>"
     await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
     await bot.send_message(
         chat_id=chat_id,
@@ -60,7 +60,7 @@ async def gen_receive_sessions(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if not sessions:
         await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
-        await update.message.reply_text("No valid session IDs detected.\n/cancel to stop.")
+        await update.message.reply_text("No valid session IDs detected.\n\n/cancel to stop.")
         return SESSIONS
 
     # Set sessions in context
@@ -68,7 +68,7 @@ async def gen_receive_sessions(update: Update, context: ContextTypes.DEFAULT_TYP
     
     # Send typing action before response
     await send_chat_action(bot, chat_id, ChatAction.TYPING, delay=0.5)
-    await update.message.reply_text("Got sessions. Now enter desired total size (e.g., 2.1GB or 500MB):")
+    await update.message.reply_text("Got sessions. Now enter desired total size: ")
     return SIZE
 
 
