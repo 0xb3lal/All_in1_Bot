@@ -5,13 +5,13 @@ from telegram import Update
 from telegram.constants import ChatAction
 from telegram.ext import CommandHandler, MessageHandler, ContextTypes, filters
 
-async def send_chat_action_loop(update: Update, context: ContextTypes.DEFAULT_TYPE, action=ChatAction.UPLOAD_VIDEO):
-    try:
-        while True:
-            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=action)
-            await asyncio.sleep(3)
-    except asyncio.CancelledError:
-        pass
+# async def send_chat_action_loop(update: Update, context: ContextTypes.DEFAULT_TYPE, action=ChatAction.UPLOAD_VIDEO):
+#     try:
+#         while True:
+#             await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=action)
+#             await asyncio.sleep(3)
+#     except asyncio.CancelledError:
+#         pass
 
 async def show_fake_progress(update: Update, context: ContextTypes.DEFAULT_TYPE, delay=0.8, start_msg="Loading..."):
     progress_states = [
