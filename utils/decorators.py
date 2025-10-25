@@ -9,7 +9,6 @@ def restricted(func):
         user_chat_id = update.effective_chat.id
 
         if user_chat_id != chat_id:
-            await update.message.reply_text("🚫 Access Denied.")
             return
 
         return await func(update, context, *args, **kwargs)

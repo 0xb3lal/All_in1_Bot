@@ -3,7 +3,8 @@ import yt_dlp
 import asyncio
 from telegram import Update
 from telegram.constants import ChatAction
-from telegram.ext import CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import MessageHandler, ContextTypes, filters
+from utils.decorators import restricted
 
 async def send_chat_action_loop(update: Update, context: ContextTypes.DEFAULT_TYPE, action=ChatAction.UPLOAD_VIDEO):
     try:
@@ -65,7 +66,7 @@ async def tiktok_downloader(link, update: Update, context: ContextTypes.DEFAULT_
 
 async def start_dl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("<b>Send The Video Link ↘</b>", parse_mode="HTML")
-
+@restricted
 async def handle_tiktok(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     if not text.startswith("https://vt.tiktok"):

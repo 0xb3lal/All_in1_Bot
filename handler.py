@@ -10,7 +10,7 @@ from telegram.ext import (
 from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
 from core import bot
-from genquery import generate_random_distribution, parse_size_to_bytes
+from utils.genquery import generate_random_distribution, parse_size_to_bytes
 from utils.decorators import restricted
 SESSIONS, SIZE = range(2)
 
@@ -176,6 +176,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ------------------ About ------------------ #
+@restricted
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     auther = "belalammar"
     about_text = f"""*Private Bot*\n\n*_Auther:_* *_[Textme](https://t.me/{auther})_*"""

@@ -10,7 +10,7 @@ from handler import (
     start,
     about
 )
-from tiktokdl import tiktok_handler
+from utils.tiktokdl import tiktok_handler
 
 if __name__ == "__main__":
 
