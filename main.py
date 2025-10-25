@@ -12,6 +12,7 @@ from handler import (
 )
 from tiktokdl import tiktok_handler
 from config import chat_id
+
 if __name__ == "__main__":
 
     app = (
