@@ -11,7 +11,7 @@ from handler import (
     about
 )
 from tiktokdl import tiktok_handler
-
+from config import chat_id
 if __name__ == "__main__":
 
     app = (
@@ -22,12 +22,12 @@ if __name__ == "__main__":
         .pool_timeout(20)
         .build()
     )
-    
+
     async def on_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Error: {context.error}")
         try:
             chat_id = update.effective_chat.id
-            await context.bot.send_message(chat_id, "⚠️ Please try again.")
+            await context.bot.send_message(chat_id, "⚠️ Error Please try again.")
         except:
             pass
 

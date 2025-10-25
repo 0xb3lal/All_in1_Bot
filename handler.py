@@ -11,6 +11,7 @@ from telegram.constants import ChatAction
 from telegram.helpers import escape_markdown
 from core import bot
 from genquery import generate_random_distribution, parse_size_to_bytes
+from utils.decorators import restricted
 SESSIONS, SIZE = range(2)
 
 
@@ -147,26 +148,16 @@ def get_generate_conv_handler():
 
 
 # ------------------ Start ------------------ #
+@restricted
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = await context.bot.get_chat(update.effective_chat.id)
     chat_id = update.effective_chat.id
-    fname = chat.first_name
-    username = chat.username
-
+    fname = update.effective_user.first_name
     escaped_fname = escape_markdown(fname, version=2)
+    
+    welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n\nDrop The Video Link"
 
-    if username == "belalammar":
-        escaped_admin = escape_markdown("Admin", version=2)
-        welcome_msg = f"*Hello {escaped_admin} 👋🏼*\n\nDrop The Video Link"
-
-
-        buttons = [[InlineKeyboardButton("🔁 Gen Query", callback_data="query")]]
-        keyboard = InlineKeyboardMarkup(buttons)
-
-    else:
-        welcome_msg = f"*Hello {escaped_fname} 👋🏼*\n\nDrop The Video Link"
-        keyboard = None
-
+    buttons = [[InlineKeyboardButton("🔁 Gen Query", callback_data="query")]]
+    keyboard = InlineKeyboardMarkup(buttons)
 
     await context.bot.send_chat_action(chat_id=chat_id, action=ChatAction.TYPING)
     await context.bot.send_message(
@@ -175,6 +166,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='MarkdownV2',
         reply_markup=keyboard
     )
+
 # ------------------ About ------------------ #
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     auther = "belalammar"
